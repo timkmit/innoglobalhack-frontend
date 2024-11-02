@@ -1,14 +1,28 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { USER_ACCESS_TOKEN } from "@/shared/consts/localStorage";
 
 interface Review {
   worker_id: string;
   user_feedback: string[];
 }
 
+interface AddReviewRequest {
+  ID_reviewer: number;
+  ID_under_review: number;
+  review: string;
+}
+
 export const rtkApi = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
     baseUrl: __API__,
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem(USER_ACCESS_TOKEN);
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
   endpoints: (build) => ({
     getAllUsers: build.query<any, void>({
@@ -23,7 +37,14 @@ export const rtkApi = createApi({
         },
       }),
     }),
+    addReview: build.mutation<void, AddReviewRequest>({
+      query: (newReview) => ({
+        url: "add_review",
+        method: "POST",
+        body: newReview,
+      }),
+    }),
   }),
 });
 
-export const { useGetAllUsersQuery, useGetUserReviewsQuery } = rtkApi;
+export const { useGetAllUsersQuery, useGetUserReviewsQuery, useAddReviewMutation } = rtkApi;
