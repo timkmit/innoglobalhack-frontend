@@ -1,11 +1,13 @@
 import React from "react";
-import { useParams } from "react-router-dom";
-import { Card, List, Descriptions, Typography, ConfigProvider } from "antd";
+import { useParams, useNavigate } from "react-router-dom";
+import { Card, List, Descriptions, Typography, ConfigProvider, Button } from "antd";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
 const ProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   const reviews = [
     { id: 1, content: "Отличный сотрудник, всегда выполняет задачи вовремя." },
@@ -31,6 +33,14 @@ const ProfilePage: React.FC = () => {
       }}
     >
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "20px" }}>
+        <Button 
+          icon={<ArrowLeftOutlined />} 
+          onClick={() => navigate(-1)} 
+          style={{ marginBottom: "20px", color: "#FFFFFF", borderColor: "#FFFFFF" }}
+        >
+          Назад
+        </Button>
+
         <Card bordered={false} style={{ marginBottom: "20px", backgroundColor: "#2C2C2C" }}>
           <Title level={2} style={{ color: "#FFFFFF" }}>Профиль сотрудника: {id}</Title>
         </Card>
