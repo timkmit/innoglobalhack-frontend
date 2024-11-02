@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, Card, Typography, ConfigProvider, message } from "antd";
 import { SignInDto, useSignInMutation, useUserActions } from "@/entities/User";
 import { USER_ACCESS_TOKEN } from "@/shared/consts/localStorage";
-import { getRouteProfile } from "@/shared/consts/router";
+import { getRouteMain } from "@/shared/consts/router";
 
 const { Title } = Typography;
 
@@ -27,7 +27,7 @@ const LoginPage: React.FC = () => {
 
         const user = { ...response, accessToken: response.access_token };
         setAuthDataRedux(user);
-        navigate(getRouteProfile());
+        navigate(getRouteMain()); 
       } else {
         throw new Error("Токен не получен");
       }
@@ -39,8 +39,11 @@ const LoginPage: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem(USER_ACCESS_TOKEN);
-    console.log("Token retrieved on load:", token);
-  }, []);
+    if (token) {
+      console.log("Token found on load. Redirecting to main page.");
+      navigate(getRouteMain());
+    }
+  }, [navigate]);
 
   return (
     <ConfigProvider

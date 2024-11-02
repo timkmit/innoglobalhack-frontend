@@ -6,7 +6,7 @@ export enum AppRoutes {
 	ADMINPANEL = "adminpanel"
 }
 
-export const getRouteMain = () => "/";
+export const getRouteMain = () => "/main";
 export const getRouteLogin = () => "/login";
 export const getRouteProfile = (id: string = ':id') => `/profile/${id}`;
 export const getRouteAdminPanel = () => "/adminpanel";
