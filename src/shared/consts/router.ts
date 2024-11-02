@@ -9,5 +9,5 @@ export enum AppRoutes {
 export const getRouteMain = () => "/";
 export const getRouteLogin = () => "/login";
 export const getRouteRegister = () => "/register";
-export const getRouteProfile = () => "profile";
+export const getRouteProfile = (id: string = ':id') => `/profile/${id}`;
 export const getRouteNotFound = () => "*";

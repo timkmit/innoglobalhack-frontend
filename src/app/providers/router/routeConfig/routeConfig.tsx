@@ -24,8 +24,8 @@ export const routeConfig: Record<AppRoutes, AppRouteProps> = {
 		element: <LazyRegisterPage />,
 	},
 	[AppRoutes.PROFILE]: {
-		path: getRouteProfile(),
+		path: getRouteProfile(':id'),
 		element: <LazyProfilePage />,
-		authOnly: false, 
+		authOnly: false,
 	},
 };
