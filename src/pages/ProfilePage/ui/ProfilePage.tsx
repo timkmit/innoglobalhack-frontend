@@ -47,7 +47,17 @@ const ProfilePage: React.FC = () => {
                 dataSource={reviews}
                 renderItem={(review) => (
                   <List.Item>
-                    <Text style={{ color: "#FFFFFF" }}>{review.user_feedback}</Text>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", color: "#FFFFFF" }}>
+                      {Array.isArray(review.user_feedback) ? (
+                        review.user_feedback.map((feedback, index) => (
+                          <span key={index} style={{ paddingRight: "10px" }}>
+                            <Text style={{ color: "#FFFFFF" }}>{index + 1}. {feedback}</Text>
+                          </span>
+                        ))
+                      ) : (
+                        <Text style={{ color: "#FFFFFF" }}>Нет отзывов</Text>
+                      )}
+                    </div>
                   </List.Item>
                 )}
               />
