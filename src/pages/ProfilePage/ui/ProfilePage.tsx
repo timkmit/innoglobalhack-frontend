@@ -12,7 +12,6 @@ const ProfilePage: React.FC = () => {
 
   const { data: reviews = [], error, isLoading } = useGetUserReviewsQuery([id!]);
 
-
   return (
     <ConfigProvider
       theme={{
@@ -43,14 +42,16 @@ const ProfilePage: React.FC = () => {
           ) : error ? (
             <Alert message="Ошибка" description="Не удалось загрузить отзывы." type="error" showIcon />
           ) : (
-            <List
-              dataSource={reviews}
-              renderItem={(review) => (
-                <List.Item>
-                  <Text style={{ color: "#FFFFFF" }}>{review.user_feedback}</Text>
-                </List.Item>
-              )}
-            />
+            <div style={{ maxHeight: "400px", overflowY: "auto", paddingRight: "10px" }}>
+              <List
+                dataSource={reviews}
+                renderItem={(review) => (
+                  <List.Item>
+                    <Text style={{ color: "#FFFFFF" }}>{review.user_feedback}</Text>
+                  </List.Item>
+                )}
+              />
+            </div>
           )}
         </Card>
       </div>

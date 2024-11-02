@@ -7,9 +7,9 @@ interface Review {
 }
 
 interface AddReviewRequest {
-  ID_reviewer: number;
-  ID_under_review: number;
-  review: string;
+  reviewer_id: number;
+  worker_id: number;
+  review_text: string;
 }
 
 export const rtkApi = createApi({

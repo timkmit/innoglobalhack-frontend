@@ -1,16 +1,25 @@
 import React from "react";
 import { Card, Input, Button, Form, ConfigProvider, Typography, notification } from "antd";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useAddReviewMutation } from "@/shared/api/rtkApi";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
 const AdminPanelPage: React.FC = () => {
   const [addReview, { isLoading }] = useAddReviewMutation();
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
-  const onFinish = async (values: { ID_reviewer: number; ID_under_review: number; review: string }) => {
+  const onFinish = async (values: { reviewer_id: number; worker_id: number; review_text: string }) => {
     try {
-      await addReview(values).unwrap();
+      const payload = {
+        reviewer: values.reviewer_id,
+        under_review: values.worker_id,
+        review: values.review_text,
+      };
+
+      await addReview(payload).unwrap();
       notification.success({
         message: "Успешно",
         description: "Отзыв успешно добавлен!",
@@ -36,32 +45,41 @@ const AdminPanelPage: React.FC = () => {
       }}
     >
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "20px" }}>
+        <Button 
+          icon={<ArrowLeftOutlined />} 
+          onClick={() => navigate(-1)} 
+          style={{ marginBottom: "20px", color: "#FFFFFF", borderColor: "#FFFFFF" }}
+        >
+          Назад
+        </Button>
+
         <Card bordered={false} style={{ marginBottom: "20px", backgroundColor: "#2C2C2C" }}>
-          <Title level={2} style={{ color: "#FFFFFF" }}>Админ панель - Добавить отзыв</Title>
+          <Title level={2} style={{ color: "#FFFFFF" }}>Панель администрирования</Title>
+          <Title level={5} style={{ color: "#FFFFFF" }}>для добавления отзывов</Title>
         </Card>
 
         <Card bordered={false} style={{ backgroundColor: "#2C2C2C" }}>
           <Form form={form} onFinish={onFinish} layout="vertical">
             <Form.Item
               label={<Text style={{ color: "#FFFFFF" }}>ID автора отзыва</Text>}
-              name="ID_reviewer"
+              name="reviewer_id"
               rules={[{ required: true, message: "Введите ID автора" }]}
             >
-              <Input type="number" placeholder="ID автора" style={{ backgroundColor: "#333", color: "#FFFFFF", borderColor: "#5A9BD5" }} />
+              <Input type="number" style={{ backgroundColor: "#333", color: "#FFFFFF", borderColor: "#5A9BD5" }} />
             </Form.Item>
             <Form.Item
               label={<Text style={{ color: "#FFFFFF" }}>ID человека, которого оценивают</Text>}
-              name="ID_under_review"
+              name="worker_id"
               rules={[{ required: true, message: "Введите ID человека под отзывом" }]}
             >
-              <Input type="number" placeholder="ID под отзывом" style={{ backgroundColor: "#333", color: "#FFFFFF", borderColor: "#5A9BD5" }} />
+              <Input type="number" style={{ backgroundColor: "#333", color: "#FFFFFF", borderColor: "#5A9BD5" }} />
             </Form.Item>
             <Form.Item
               label={<Text style={{ color: "#FFFFFF" }}>Текст отзыва</Text>}
-              name="review"
+              name="review_text"
               rules={[{ required: true, message: "Введите текст отзыва" }]}
             >
-              <Input.TextArea rows={4} placeholder="Введите текст отзыва" style={{ backgroundColor: "#333", color: "#FFFFFF", borderColor: "#5A9BD5" }} />
+              <Input.TextArea rows={4} style={{ backgroundColor: "#333", color: "#FFFFFF", borderColor: "#5A9BD5" }} />
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit" loading={isLoading} style={{ backgroundColor: "#5A9BD5", borderColor: "#5A9BD5" }}>

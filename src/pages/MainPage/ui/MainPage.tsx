@@ -2,16 +2,34 @@ import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Page } from "@/widgets/Page";
 import UserList from "@/widgets/UserList/ui/UserList";
-import { Row, Col, Typography } from "antd";
+import { Row, Col, Typography, Tooltip, Button } from "antd";
+import { SettingOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 
 const MainPage = memo(() => {
   const { t } = useTranslation("main");
+  const navigate = useNavigate();
 
   return (
-    <Row justify="center" style={{ padding: "20px", textAlign: "center" }}>
+    <Row justify="center" style={{ padding: "20px", textAlign: "center", position: "relative" }}>
       <Col span={24}>
+        {/* Значок для перехода на страницу админ-панели */}
+        <Tooltip title="Админ панель">
+          <Button
+            type="text"
+            icon={<SettingOutlined style={{ fontSize: "24px", color: "#FFFFFF" }} />}
+            onClick={() => navigate("/adminpanel")}
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              margin: "20px",
+            }}
+          />
+        </Tooltip>
+
         <Page>
           <Title
             level={1}
