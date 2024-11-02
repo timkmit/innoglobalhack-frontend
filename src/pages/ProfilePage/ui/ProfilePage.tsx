@@ -10,8 +10,8 @@ const ProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // Используем хук для получения отзывов
-  const { data: reviews = [], error, isLoading } = useGetUserReviewsQuery(id!);
+  const { data: reviews = [], error, isLoading } = useGetUserReviewsQuery([id!]);
+
 
   return (
     <ConfigProvider
