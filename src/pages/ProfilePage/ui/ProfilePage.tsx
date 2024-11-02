@@ -1,7 +1,8 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Card, List, Descriptions, Typography, ConfigProvider, Button } from "antd";
+import { Card, List, Typography, ConfigProvider, Button, Spin, Alert } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import { useGetUserReviewsQuery } from "@/shared/api/rtkApi";
 
 const { Title, Text } = Typography;
 
@@ -9,17 +10,8 @@ const ProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const reviews = [
-    { id: 1, content: "Отличный сотрудник, всегда выполняет задачи вовремя." },
-    { id: 2, content: "Показывает отличные результаты в командной работе." },
-    { id: 3, content: "Очень ответственный и внимательный к деталям." },
-  ];
-
-  const summary = {
-    projects: 12,
-    experience: "3 года",
-    rating: "5/5",
-  };
+  // Используем хук для получения отзывов
+  const { data: reviews = [], error, isLoading } = useGetUserReviewsQuery(id!);
 
   return (
     <ConfigProvider
@@ -45,27 +37,21 @@ const ProfilePage: React.FC = () => {
           <Title level={2} style={{ color: "#FFFFFF" }}>Профиль сотрудника: {id}</Title>
         </Card>
 
-        <Card
-          title={<span style={{ color: "#FFFFFF" }}>Краткая сводка</span>}
-          bordered={false}
-          style={{ marginBottom: "20px", backgroundColor: "#2C2C2C" }}
-        >
-          <Descriptions column={1} style={{ color: "#FFFFFF" }}>
-            <Descriptions.Item><span style={{ color: "#FFFFFF" }}>Проектов: {summary.projects}</span></Descriptions.Item>
-            <Descriptions.Item>Опыт: {summary.experience}</Descriptions.Item>
-            <Descriptions.Item>Рейтинг: {summary.rating}</Descriptions.Item>
-          </Descriptions>
-        </Card>
-
         <Card title={<span style={{ color: "#FFFFFF" }}>Отзывы</span>} bordered={false} style={{ backgroundColor: "#2C2C2C" }}>
-          <List
-            dataSource={reviews}
-            renderItem={(review) => (
-              <List.Item>
-                <Text style={{ color: "#FFFFFF" }}>{review.content}</Text>
-              </List.Item>
-            )}
-          />
+          {isLoading ? (
+            <Spin tip="Загрузка отзывов..." />
+          ) : error ? (
+            <Alert message="Ошибка" description="Не удалось загрузить отзывы." type="error" showIcon />
+          ) : (
+            <List
+              dataSource={reviews}
+              renderItem={(review) => (
+                <List.Item>
+                  <Text style={{ color: "#FFFFFF" }}>{review.user_feedback}</Text>
+                </List.Item>
+              )}
+            />
+          )}
         </Card>
       </div>
     </ConfigProvider>
