@@ -53,7 +53,7 @@ const UserList: React.FC = () => {
     setIsModalVisible(false);
   };
 
-  const filteredUsers = users.filter((user: string) => user.includes(searchTerm));
+  const filteredUsers = users ? users.filter((user: string) => user.includes(searchTerm)) : [];
 
   return (
     <ConfigProvider theme={{ token: { colorBgContainer: "#1F1F1F", colorText: "#FFFFFF" } }}>
