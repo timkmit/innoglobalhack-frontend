@@ -149,14 +149,14 @@ const UserList: React.FC = () => {
           },
         }}
       >
-        <p style={{ color: "#000000", fontSize: "large" }}>Отзывы об этом сотруднике</p>
+        <p style={{ color: "#000000", fontSize: "large" }}>Список отзывов</p>
         {isReviewsLoading ? (
           <Spin style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "20px" }} />
         ) : reviews && reviews.length > 0 ? (
           reviews.map((review) => (
             <div key={review.worker_id} style={{ marginBottom: "20px" }}>
-              <p style={{ color: "#000000" }}>ID сотрудника: {review.worker_id}</p>
-              <p style={{ color: "#000000" }}>Отзывы:</p>
+              <p style={{ color: "#000000" }}>ID: {review.worker_id}</p>
+              <p style={{ color: "#000000" }}>Отзывы этого сотрудника:</p>
               <div
                 style={{
                   maxHeight: "200px",
@@ -170,7 +170,7 @@ const UserList: React.FC = () => {
                 <ul style={{ paddingLeft: "20px" }}>
                   {Array.isArray(review.user_feedback) ? (
                     review.user_feedback.map((feedback, index) => (
-                      <li key={index} style={{ color: "#000000" }}>{feedback}</li>
+                      <div key={index} style={{ color: "#000000", padding: "5px" }}><div style={{border: "1px", background: "lightgrey", borderRadius: "10px", padding: "5px"}}>{feedback}</div></div>
                     ))
                   ) : (
                     <li style={{ color: "#000000" }}>Нет отзывов</li>
