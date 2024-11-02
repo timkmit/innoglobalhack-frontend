@@ -14,11 +14,11 @@ const AdminPanelPage: React.FC = () => {
   const onFinish = async (values: { reviewer_id: number; worker_id: number; review_text: string }) => {
     try {
       const payload = {
-        reviewer: values.reviewer_id,
-        under_review: values.worker_id,
-        review: values.review_text,
+        reviewer_id: values.reviewer_id,
+        worker_id: values.worker_id,
+        review_text: values.review_text,
       };
-
+  
       await addReview(payload).unwrap();
       notification.success({
         message: "Успешно",
@@ -32,6 +32,7 @@ const AdminPanelPage: React.FC = () => {
       });
     }
   };
+  
 
   return (
     <ConfigProvider
