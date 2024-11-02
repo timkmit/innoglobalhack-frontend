@@ -1,15 +1,16 @@
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { LazyMainPage } from "@/pages/MainPage";
-import { AppRoutes, getRouteLogin, getRouteMain, getRouteNotFound, getRouteRegister, getRouteProfile } from "@/shared/consts/router";
+import { AppRoutes, getRouteLogin, getRouteMain, getRouteNotFound,  getRouteProfile, getRouteAdminPanel } from "@/shared/consts/router";
 import { AppRouteProps } from "@/shared/types/router";
 import { LazyLoginPage } from "@/pages/Login";
-import { LazyRegisterPage } from "@/pages/Register";
 import { LazyProfilePage } from "@/pages/ProfilePage";
+import { LazyAdminPanelPage } from "@/pages/AdminPanel";
 
 export const routeConfig: Record<AppRoutes, AppRouteProps> = {
 	[AppRoutes.MAIN]: {
 		path: getRouteMain(),
 		element: <LazyMainPage />,
+		authOnly: true,
 	},
 	[AppRoutes.NOT_FOUND]: {
 		path: getRouteNotFound(),
@@ -19,13 +20,15 @@ export const routeConfig: Record<AppRoutes, AppRouteProps> = {
 		path: getRouteLogin(),
 		element: <LazyLoginPage />,
 	},
-	[AppRoutes.REGISTER]: {
-		path: getRouteRegister(),
-		element: <LazyRegisterPage />,
-	},
 	[AppRoutes.PROFILE]: {
 		path: getRouteProfile(':id'),
 		element: <LazyProfilePage />,
-		authOnly: false,
+		authOnly: true,
 	},
+	[AppRoutes.ADMINPANEL]: {
+		path: getRouteAdminPanel(),
+		element: <LazyAdminPanelPage />,
+		authOnly: true,
+	},
+
 };

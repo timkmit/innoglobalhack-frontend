@@ -3,31 +3,15 @@ import { SignInDto } from "../model/types/dto/SignInDto";
 import { User } from "../model/types/User";
 
 const userApi = rtkApi.injectEndpoints({
-	endpoints: (build) => ({
-		getMe: build.query<User, undefined>({
-			query: () => "/user",
-		}),
-
-		register: build.mutation<User & { accessToken: string }, SignInDto>({
-			query: (authData) => ({
-				url: "user/register",
-				body: authData,
-				method: "POST",
-			}),
-		}),
-
-		signIn: build.mutation<User & { accessToken: string }, SignInDto>({
-			query: (authData) => ({
-				url: "/user/signIn",
-				body: authData,
-				method: "POST",
-			}),
-		}),
-
-		signOut: build.mutation({
-			query: () => "/user/signOut",
-		}),
-	}),
+  endpoints: (build) => ({
+    signIn: build.mutation<User & { accessToken: string }, SignInDto>({
+      query: (authData) => ({
+        url: "https://api.pepper-coding.ru/login",
+        body: authData,
+        method: "POST",
+      }),
+    }),
+  }),
 });
 
-export const { useRegisterMutation, useSignInMutation, useSignOutMutation, useGetMeQuery } = userApi;
+export const { useSignInMutation } = userApi;

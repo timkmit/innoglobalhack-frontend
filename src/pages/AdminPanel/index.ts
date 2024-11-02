@@ -1,0 +1,1 @@
+export { LazyAdminPanelPage } from "./ui/AdminPanelPage.lazy";

@@ -1,18 +1,20 @@
 import React, { useState } from "react";
-import { Table, Button, ConfigProvider, Modal, Tooltip, Input, Spin } from "antd";
+import { Table, Button, ConfigProvider, Modal, Tooltip, Input, Spin, Pagination, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useGetAllUsersQuery, useGetUserReviewsQuery } from "@/shared/api/rtkApi";
 
 const UserList: React.FC = () => {
   const navigate = useNavigate();
-  const { data: response = { worker_ids: [] }, error, isLoading } = useGetAllUsersQuery();
-  const users: string[] = response.worker_ids;
+  const { data: response = { workers_data: [] }, error, isLoading } = useGetAllUsersQuery();
+  const users: string[] = response.workers_data.map(String);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showTooltip, setShowTooltip] = useState(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 15;
 
   const { data: reviews, isLoading: isReviewsLoading } = useGetUserReviewsQuery(selectedIds, {
     skip: !isModalVisible || selectedIds.length === 0,
@@ -25,12 +27,12 @@ const UserList: React.FC = () => {
 
   const columns = [
     {
-      title: <span style={{ color: '#FFFFFF' }}>ID сотрудника</span>,
+      title: <span style={{ color: "#FFFFFF" }}>ID сотрудника</span>,
       dataIndex: "id",
       render: (id: string) => (
         <a
           onClick={() => navigate(`/profile/${id}`)}
-          style={{ color: selectedRowKeys.includes(id) ? '#000000' : '#FFFFFF' }}
+          style={{ color: selectedRowKeys.includes(id) ? "#000000" : "#FFFFFF" }}
         >
           {id}
         </a>
@@ -40,11 +42,18 @@ const UserList: React.FC = () => {
 
   const rowSelection = {
     selectedRowKeys,
-    onChange: (keys: React.Key[]) => setSelectedRowKeys(keys),
+    hideSelectAll: true,
+    onChange: (keys: React.Key[]) => {
+      if (keys.length > 5) {
+        message.warning("Можно выбрать не более 5 сотрудников");
+      } else {
+        setSelectedRowKeys(keys);
+      }
+    },
   };
 
   const handleSubmit = () => {
-    setSelectedIds(selectedRowKeys.map(key => key.toString()));
+    setSelectedIds(selectedRowKeys.map((key) => key.toString()));
     setSelectedRowKeys([]);
     setIsModalVisible(true);
   };
@@ -53,7 +62,12 @@ const UserList: React.FC = () => {
     setIsModalVisible(false);
   };
 
-  const filteredUsers = users.filter((user: string) => user.includes(searchTerm));
+  const filteredUsers = users.filter((user) => user.includes(searchTerm));
+  const paginatedUsers = filteredUsers.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   return (
     <ConfigProvider theme={{ token: { colorBgContainer: "#1F1F1F", colorText: "#FFFFFF" } }}>
@@ -77,16 +91,25 @@ const UserList: React.FC = () => {
         ) : error ? (
           <div style={{ textAlign: "center", color: "#FF4D4F" }}>Ошибка при загрузке пользователей</div>
         ) : (
-          <Table
-            rowSelection={rowSelection} 
-            columns={columns}
-            dataSource={filteredUsers.map((id) => ({ key: id, id }))}
-            pagination={false}
-            rowClassName={(record) =>
-              selectedRowKeys.includes(record.id) ? "selected-row" : "default-row"
-            }
-            bordered
-          />
+          <>
+            <Table
+              rowSelection={rowSelection} 
+              columns={columns}
+              dataSource={paginatedUsers.map((id) => ({ key: id, id }))}
+              pagination={false}
+              rowClassName={(record) =>
+                selectedRowKeys.includes(record.id) ? "selected-row" : "default-row"
+              }
+              bordered
+            />
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={filteredUsers.length}
+              onChange={handlePageChange}
+              style={{ marginTop: 16, textAlign: "center" }}
+            />
+          </>
         )}
 
         <Tooltip
@@ -117,32 +140,51 @@ const UserList: React.FC = () => {
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalOk}
-        style={{ color: "#000000" }}
-        styles={{ body: { color: "#000000" } }}
+        style={{ color: "#000000", width: "60%", maxWidth: "800px" }}
+        destroyOnClose={true}
+        styles={{
+          body: {
+            color: "#000000",
+            padding: "20px",
+          },
+        }}
       >
-        <p style={{ color: "#000000", fontSize: "large" }}>Отзывы сотрудников</p>
+        <p style={{ color: "#000000", fontSize: "large" }}>Отзывы об этом сотруднике</p>
         {isReviewsLoading ? (
           <Spin style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "20px" }} />
         ) : reviews && reviews.length > 0 ? (
           reviews.map((review) => (
-            <div key={review.worker_id}>
+            <div key={review.worker_id} style={{ marginBottom: "20px" }}>
               <p style={{ color: "#000000" }}>ID сотрудника: {review.worker_id}</p>
               <p style={{ color: "#000000" }}>Отзывы:</p>
-              <ul>
-                {Array.isArray(review.user_feedback) ? (
-                  review.user_feedback.map((feedback, index) => (
-                    <li key={index} style={{ color: "#000000" }}>{feedback}</li>
-                  ))
-                ) : (
-                  <li style={{ color: "#000000" }}>Нет отзывов</li>
-                )}
-              </ul>
+              <div
+                style={{
+                  maxHeight: "200px",
+                  overflowY: "auto",
+                  padding: "10px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  backgroundColor: "#f5f5f5",
+                }}
+              >
+                <ul style={{ paddingLeft: "20px" }}>
+                  {Array.isArray(review.user_feedback) ? (
+                    review.user_feedback.map((feedback, index) => (
+                      <li key={index} style={{ color: "#000000" }}>{feedback}</li>
+                    ))
+                  ) : (
+                    <li style={{ color: "#000000" }}>Нет отзывов</li>
+                  )}
+                </ul>
+              </div>
             </div>
           ))
         ) : (
           <p style={{ color: "#000000" }}>Нет отзывов для выбранных сотрудников.</p>
         )}
       </Modal>
+
+
     </ConfigProvider>
   );
 };

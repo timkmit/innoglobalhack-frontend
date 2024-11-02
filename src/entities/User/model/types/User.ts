@@ -5,6 +5,7 @@ export interface User {
 	username: string;
 	avatar?: string;
 	roles?: UserRoles[];
+	access_token: string;
 }
 
 export interface UserSchema {
