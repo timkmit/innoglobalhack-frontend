@@ -8,12 +8,12 @@ import { rtkApi } from "@/shared/api/rtkApi";
 // import { NavigateOptions, To } from 'react-router-dom'
 
 export const createReduxStore = (
-	initaialState?: StateSchema,
+	initialState?: StateSchema,
 	asyncReducers?: ReducersMapObject<StateSchema>,
 	// nav?: (to: To, options?: NavigateOptions) => void
 ) => {
 	const rootReducers: ReducersMapObject<StateSchema> = {
-		...asyncReducers,
+		...(asyncReducers || {}),
 		user: UserReducer,
 		ui: UIReducer,
 		[rtkApi.reducerPath]: rtkApi.reducer,
@@ -25,7 +25,7 @@ export const createReduxStore = (
 		// @ts-ignore
 		reducer: reducerManager.reduce as Reducer<StateSchema>,
 		devTools: __IS_DEV__,
-		preloadedState: initaialState,
+		preloadedState: initialState,
 		middleware: (getDefaultMiddleware) =>
 			getDefaultMiddleware({
 				thunk: {

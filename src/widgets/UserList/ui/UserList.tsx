@@ -1,25 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Table, Button, ConfigProvider, Modal, Tooltip } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useGetAllWorkersQuery } from "../api/rtkApi";
-
-interface User {
-  key: number;
-  id: string;
-}
-
+import { useGetAllUsersQuery } from "@/shared/api/rtkApi";
 const UserList: React.FC = () => {
   const navigate = useNavigate();
-  const { data, isLoading } = useGetAllWorkersQuery();
+  const { data: response = { worker_ids: [] }, error, isLoading } = useGetAllUsersQuery();
+  const users = response.worker_ids;
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showTooltip, setShowTooltip] = useState(true);
 
-  const users: User[] =
-    data?.worker_ids.map((id: string, index: number) => ({ key: index, id })) || [];
-
-  useEffect(() => {
+  React.useEffect(() => {
     const tooltipShown = localStorage.getItem("tooltipShown");
     if (tooltipShown) setShowTooltip(false);
   }, []);
@@ -31,14 +24,12 @@ const UserList: React.FC = () => {
 
   const columns = [
     {
-      title: <span style={{ color: "#FFFFFF" }}>ID сотрудника</span>,
+      title: <span style={{ color: '#FFFFFF' }}>ID сотрудника</span>,
       dataIndex: "id",
-      render: (id: string, record: User) => (
+      render: (id: string) => (
         <a
           onClick={() => navigate(`/profile/${id}`)}
-          style={{
-            color: selectedRowKeys.includes(record.key) ? "#000000" : "#FFFFFF",
-          }}
+          style={{ color: selectedRowKeys.includes(id) ? '#000000' : '#FFFFFF' }}
         >
           {id}
         </a>
@@ -52,7 +43,7 @@ const UserList: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    setSelectedIds(selectedRowKeys.map((key) => users[key as number].id));
+    setSelectedIds(selectedRowKeys.map(key => key.toString()));
     setSelectedRowKeys([]);
     setIsModalVisible(true);
   };
@@ -62,37 +53,31 @@ const UserList: React.FC = () => {
   };
 
   return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorBgContainer: "#1F1F1F",
-          colorText: "#FFFFFF",
-          colorBgElevated: "#333333",
-        },
-      }}
-    >
+    <ConfigProvider theme={{ token: { colorBgContainer: '#1F1F1F', colorText: '#FFFFFF' } }}>
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "50px 0" }}>
         {isLoading ? (
-          <p>Loading...</p>
+          <div style={{ textAlign: 'center', color: '#FFFFFF' }}>Загрузка...</div>
+        ) : error ? (
+          <div style={{ textAlign: 'center', color: '#FF4D4F' }}>Ошибка при загрузке пользователей</div>
         ) : (
           <Table
             rowSelection={rowSelection}
             columns={columns}
-            dataSource={users}
+            //@ts-ignore
+            dataSource={users.map((id, index) => ({ key: index, id }))} 
             pagination={false}
             rowClassName="dark-row"
           />
         )}
-        <Tooltip
-          title="Если Вам необходимо получить уязвимые места группы людей, выберите их из списка и нажмите 'Отправить'"
-          open={showTooltip}
+        <Tooltip 
+          title="Если Вам необходимо получить уязвимые места группы людей, выберите их из списка и нажмите 'Отправить'" 
+          open={showTooltip} 
           onOpenChange={handleTooltipClose}
-          overlayInnerStyle={{ backgroundColor: "#333333", color: "#FFFFFF" }}
         >
           <Button
             type="primary"
             onClick={handleSubmit}
-            style={{ marginTop: 16, color: "#FFFFFF" }}
+            style={{ marginTop: 16, color: '#FFFFFF' }}
             disabled={selectedRowKeys.length === 0}
           >
             Отправить
@@ -100,16 +85,14 @@ const UserList: React.FC = () => {
         </Tooltip>
       </div>
 
-      <Modal
-        open={isModalVisible}
-        onOk={handleModalOk}
+      <Modal 
+        open={isModalVisible} 
+        onOk={handleModalOk} 
         onCancel={handleModalOk}
-        style={{ color: "#000000" }}
+        style={{ color: '#000000' }}
       >
-        <p style={{ color: "#000000", fontSize: "large" }}>Сообщение</p>
-        <p style={{ color: "#000000" }}>
-          Вы выбрали следующие ID: {selectedIds.join(", ")}
-        </p>
+        <p style={{ color: '#000000', fontSize: 'large' }}>Сообщение</p>
+        <p style={{ color: '#000000' }}>Вы выбрали следующие ID: {selectedIds.join(", ")}</p> 
       </Modal>
     </ConfigProvider>
   );

@@ -26,8 +26,8 @@ const MainPage = memo(() => {
           >
             {t("Vulnerability Analyzer")}
           </Title>
+          <UserList />
         </Page>
-        <UserList />
       </Col>
 
       <style>
