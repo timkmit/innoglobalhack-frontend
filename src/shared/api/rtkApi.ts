@@ -44,7 +44,16 @@ export const rtkApi = createApi({
         body: newReview,
       }),
     }),
+    startAnalysis: build.mutation<{ message: string; request_id: number }, string[]>({
+      query: (worker_ids) => ({
+        url: "start_analysis",
+        method: "POST",
+        body: {
+          worker_ids,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useGetAllUsersQuery, useGetUserReviewsQuery, useAddReviewMutation } = rtkApi;
+export const { useGetAllUsersQuery, useGetUserReviewsQuery, useAddReviewMutation, useStartAnalysisMutation } = rtkApi;

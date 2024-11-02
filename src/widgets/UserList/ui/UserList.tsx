@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Table, Button, ConfigProvider, Modal, Tooltip, Input, Spin, Pagination, message } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useGetAllUsersQuery, useGetUserReviewsQuery } from "@/shared/api/rtkApi";
+import { useGetAllUsersQuery, useGetUserReviewsQuery, useStartAnalysisMutation } from "@/shared/api/rtkApi";
 
 const UserList: React.FC = () => {
   const navigate = useNavigate();
@@ -19,6 +19,8 @@ const UserList: React.FC = () => {
   const { data: reviews, isLoading: isReviewsLoading } = useGetUserReviewsQuery(selectedIds, {
     skip: !isModalVisible || selectedIds.length === 0,
   });
+
+  const [startAnalysis] = useStartAnalysisMutation();
 
   const handleTooltipClose = () => {
     setShowTooltip(false);
@@ -60,6 +62,15 @@ const UserList: React.FC = () => {
 
   const handleModalOk = () => {
     setIsModalVisible(false);
+  };
+
+  const handleStartAnalysis = async () => {
+    try {
+      const { message: startMessage, request_id } = await startAnalysis(selectedIds).unwrap();
+      message.success(`${startMessage}. ID запроса: ${request_id}`);
+    } catch {
+      message.error("Ошибка при запуске анализа");
+    }
   };
 
   const filteredUsers = users.filter((user) => user.includes(searchTerm));
@@ -170,7 +181,11 @@ const UserList: React.FC = () => {
                 <ul style={{ paddingLeft: "20px" }}>
                   {Array.isArray(review.user_feedback) ? (
                     review.user_feedback.map((feedback, index) => (
-                      <div key={index} style={{ color: "#000000", padding: "5px" }}><div style={{border: "1px", background: "lightgrey", borderRadius: "10px", padding: "5px"}}>{feedback}</div></div>
+                      <div key={index} style={{ color: "#000000", padding: "5px" }}>
+                        <div style={{ border: "1px", background: "lightgrey", borderRadius: "10px", padding: "5px" }}>
+                          {feedback}
+                        </div>
+                      </div>
                     ))
                   ) : (
                     <li style={{ color: "#000000" }}>Нет отзывов</li>
@@ -182,9 +197,20 @@ const UserList: React.FC = () => {
         ) : (
           <p style={{ color: "#000000" }}>Нет отзывов для выбранных сотрудников.</p>
         )}
+
+        <Button
+          type="primary"
+          onClick={handleStartAnalysis}
+          style={{
+            marginTop: 16,
+            color: "#FFFFFF",
+            backgroundColor: "#007bff",
+            borderColor: "#007bff",
+          }}
+        >
+          Начать анализ
+        </Button>
       </Modal>
-
-
     </ConfigProvider>
   );
 };
