@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Table, Button, ConfigProvider, Modal } from "antd";
+import React, { useState, useEffect } from "react";
+import { Table, Button, ConfigProvider, Modal, Tooltip } from "antd";
 import { useNavigate } from "react-router-dom";
 
 interface User {
@@ -18,6 +18,17 @@ const UserList: React.FC = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [showTooltip, setShowTooltip] = useState(true);
+
+  useEffect(() => {
+    const tooltipShown = localStorage.getItem("tooltipShown");
+    if (tooltipShown) setShowTooltip(false);
+  }, []);
+
+  const handleTooltipClose = () => {
+    setShowTooltip(false);
+    localStorage.setItem("tooltipShown", "true");
+  };
 
   const columns = [
     {
@@ -40,7 +51,6 @@ const UserList: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    console.log("Выбранные IDs:", selectedRowKeys);
     setSelectedIds(selectedRowKeys.map(key => users[key as number].id));
     setSelectedRowKeys([]);
     setIsModalVisible(true); 
@@ -51,7 +61,15 @@ const UserList: React.FC = () => {
   };
 
   return (
-    <ConfigProvider theme={{ token: { colorBgContainer: '#1F1F1F', colorText: '#FFFFFF' } }}>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorBgContainer: '#1F1F1F',
+          colorText: '#FFFFFF',
+          colorBgElevated: '#333333'
+        }
+      }}
+    >
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "50px 0" }}>
         <Table
           rowSelection={rowSelection}
@@ -60,14 +78,21 @@ const UserList: React.FC = () => {
           pagination={false}
           rowClassName="dark-row"
         />
-        <Button
-          type="primary"
-          onClick={handleSubmit}
-          style={{ marginTop: 16, color: '#FFFFFF' }} 
-          disabled={selectedRowKeys.length === 0}
+        <Tooltip
+          title="Если Вам необходимо получить уязвимые места группы людей, выберите их из списка и нажмите 'Отправить'"
+          open={showTooltip}
+          onOpenChange={handleTooltipClose}
+          overlayInnerStyle={{ backgroundColor: '#333333', color: '#FFFFFF' }}
         >
-          Отправить
-        </Button>
+          <Button
+            type="primary"
+            onClick={handleSubmit}
+            style={{ marginTop: 16, color: '#FFFFFF' }}
+            disabled={selectedRowKeys.length === 0}
+          >
+            Отправить
+          </Button>
+        </Tooltip>
       </div>
 
       <Modal 
