@@ -24,8 +24,6 @@ RUN yarn build
 
 FROM nginx:1.26.2 AS image
 
-COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
-
-COPY --from=build /app/dist /var/www/data
+COPY --from=build /app/dist /usr/share/nginx/html
 
 CMD ["nginx", "-g", "daemon off;"]
