@@ -8,7 +8,7 @@ interface Review {
 export const rtkApi = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://26.162.75.128:8000/",
+    baseUrl: __API__
   }),
   endpoints: (build) => ({
     getAllUsers: build.query<any, void>({

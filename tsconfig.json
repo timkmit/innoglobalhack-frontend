@@ -21,6 +21,7 @@
 		"compilerOptions": {
 			"module": "CommonJS",
 			"moduleResolution": "node16",
+			"skipLibCheck": true
 		}
 	}
 }
