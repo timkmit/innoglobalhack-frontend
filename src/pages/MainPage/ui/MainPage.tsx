@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Page } from "@/widgets/Page";
 import UserList from "@/widgets/UserList/ui/UserList";
 import { Row, Col, Typography, Tooltip, Button } from "antd";
-import { SettingOutlined } from "@ant-design/icons";
+import { UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
@@ -18,7 +18,7 @@ const MainPage = memo(() => {
         <Tooltip title="Админ панель">
           <Button
             type="text"
-            icon={<SettingOutlined style={{ fontSize: "24px", color: "#FFFFFF" }} />}
+            icon={<UserOutlined style={{ fontSize: "24px", color: "#FFFFFF" }} />}  // Используем UserOutlined
             onClick={() => navigate("/adminpanel")}
             style={{
               position: "absolute",

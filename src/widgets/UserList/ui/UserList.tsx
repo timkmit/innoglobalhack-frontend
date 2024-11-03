@@ -125,8 +125,8 @@ const UserList: React.FC = () => {
               onClick={handleSubmit}
               style={{
                 color: "#FFFFFF",
-                backgroundColor: "#333",
-                borderColor: "#5A9BD5",
+                backgroundColor: "#007bff",
+                borderColor: "#007bff", 
                 borderWidth: 1,
                 borderStyle: "solid",
                 borderRadius: "4px",
