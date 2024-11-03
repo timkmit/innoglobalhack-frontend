@@ -33,4 +33,8 @@ export const GlobalStyles = createGlobalStyle`
   .ant-select-dropdown .ant-select-item {
     color: #000000 !important;
   }
+
+  .ant-pagination-item-active a {
+    color: #FFFFFF !important;
+  }
 `;

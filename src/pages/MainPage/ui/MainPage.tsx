@@ -15,7 +15,6 @@ const MainPage = memo(() => {
   return (
     <Row justify="center" style={{ padding: "20px", textAlign: "center", position: "relative" }}>
       <Col span={24}>
-        {/* Значок для перехода на страницу админ-панели */}
         <Tooltip title="Админ панель">
           <Button
             type="text"
@@ -42,7 +41,7 @@ const MainPage = memo(() => {
               margin: 0,
             }}
           >
-            {t("Vulnerability Analyzer")}
+            {t("HR Helper")}
           </Title>
           <UserList />
         </Page>

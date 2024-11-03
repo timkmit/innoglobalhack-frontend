@@ -8,9 +8,8 @@ const UserList: React.FC = () => {
   const { data: response = { workers_data: [] }, error, isLoading } = useGetAllUsersQuery();
   const users: string[] = response.workers_data.map(String);
 
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [showTooltip, setShowTooltip] = useState(() => {
@@ -18,8 +17,8 @@ const UserList: React.FC = () => {
   });
   const pageSize = 15;
 
-  const { data: reviews, isLoading: isReviewsLoading } = useGetUserReviewsQuery(selectedIds, {
-    skip: !isModalVisible || selectedIds.length === 0,
+  const { data: reviews, isLoading: isReviewsLoading } = useGetUserReviewsQuery(Array.from(selectedIds), {
+    skip: !isModalVisible || selectedIds.size === 0,
   });
 
   const [startAnalysis] = useStartAnalysisMutation();
@@ -29,6 +28,13 @@ const UserList: React.FC = () => {
     localStorage.setItem("tooltipShown", "true");
   };
 
+  const handleClearSelection = () => {
+    setSelectedIds(new Set());
+  };
+
+  const filteredUsers = users.filter((user) => user.includes(searchTerm));
+  const paginatedUsers = filteredUsers.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   const columns = [
     {
       title: <span style={{ color: "#FFFFFF" }}>ID сотрудника</span>,
@@ -36,7 +42,7 @@ const UserList: React.FC = () => {
       render: (id: string) => (
         <a
           onClick={() => navigate(`/profile/${id}`)}
-          style={{ color: selectedRowKeys.includes(id) ? "#000000" : "#FFFFFF" }}
+          style={{ color: selectedIds.has(id) ? "#000000" : "#FFFFFF" }}
         >
           {id}
         </a>
@@ -45,20 +51,32 @@ const UserList: React.FC = () => {
   ];
 
   const rowSelection = {
-    selectedRowKeys,
-    hideSelectAll: true,
+    selectedRowKeys: Array.from(selectedIds).filter((id) => paginatedUsers.includes(id)),
     onChange: (keys: React.Key[]) => {
       if (keys.length > 5) {
         message.warning("Можно выбрать не более 5 сотрудников");
       } else {
-        setSelectedRowKeys(keys);
+        const newSelectedIds = new Set(selectedIds);
+        keys.forEach((key) => newSelectedIds.add(key.toString()));
+        setSelectedIds(newSelectedIds);
       }
+    },
+    onSelect: (record: { id: string }, selected: boolean) => {
+      const newSelectedIds = new Set(selectedIds);
+      if (selected) {
+        if (newSelectedIds.size >= 5) {
+          
+          return;
+        }
+        newSelectedIds.add(record.id);
+      } else {
+        newSelectedIds.delete(record.id);
+      }
+      setSelectedIds(newSelectedIds);
     },
   };
 
   const handleSubmit = () => {
-    setSelectedIds(selectedRowKeys.map((key) => key.toString()));
-    setSelectedRowKeys([]);
     setIsModalVisible(true);
   };
 
@@ -68,15 +86,12 @@ const UserList: React.FC = () => {
 
   const handleStartAnalysis = async () => {
     try {
-      const { message: startMessage, request_id } = await startAnalysis(selectedIds).unwrap();
+      const { message: startMessage, request_id } = await startAnalysis(Array.from(selectedIds)).unwrap();
       message.success(`${startMessage}. ID запроса: ${request_id}`);
     } catch {
       message.error("Ошибка при запуске анализа");
     }
   };
-
-  const filteredUsers = users.filter((user) => user.includes(searchTerm));
-  const paginatedUsers = filteredUsers.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -115,12 +130,27 @@ const UserList: React.FC = () => {
                 borderWidth: 1,
                 borderStyle: "solid",
                 borderRadius: "4px",
+                marginLeft: 8,
               }}
-              disabled={selectedRowKeys.length === 0}
+              disabled={selectedIds.size === 0}
             >
               Анализ
             </Button>
           </Tooltip>
+          {selectedIds.size > 0 && (
+            <Button
+              onClick={handleClearSelection}
+              style={{
+                marginLeft: 8,
+                color: "#FFFFFF",
+                backgroundColor: "#FF4D4F",
+                borderColor: "#FF4D4F",
+                borderRadius: "4px",
+              }}
+            >
+              Очистить выбор
+            </Button>
+          )}
         </div>
 
         {isLoading ? (
@@ -130,12 +160,15 @@ const UserList: React.FC = () => {
         ) : (
           <>
             <Table
-              rowSelection={rowSelection} 
+              rowSelection={{
+                ...rowSelection,
+                selectedRowKeys: Array.from(selectedIds).filter((id) => paginatedUsers.includes(id)),
+              }}
               columns={columns}
               dataSource={paginatedUsers.map((id) => ({ key: id, id }))}
               pagination={false}
               rowClassName={(record) =>
-                selectedRowKeys.includes(record.id) ? "selected-row" : "default-row"
+                selectedIds.has(record.id) ? "selected-row" : "default-row"
               }
               bordered
             />
@@ -154,7 +187,12 @@ const UserList: React.FC = () => {
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalOk}
-        style={{ color: "#000000", width: "60%", maxWidth: "800px" }}
+        style={{
+          color: "#000000",
+          width: "60%",
+          maxWidth: "800px",
+          ...(window.innerWidth < 600 ? { width: "70%" } : {}),
+        }}
         destroyOnClose={true}
         styles={{
           body: {

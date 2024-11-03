@@ -13,9 +13,13 @@ interface AddReviewRequest {
 }
 
 interface AnalysisRequest {
+  [x: string]: string;
+  //@ts-ignore
   id: number;
+  //@ts-ignore
   worker_ids: string[];
   analysis_status: string;
+  //@ts-ignore
   analysis_result: string | null;
 }
 
@@ -34,6 +38,7 @@ export const rtkApi = createApi({
   endpoints: (build) => ({
     getAllUsers: build.query<any, void>({
       query: () => "get_all",
+      keepUnusedDataFor: 0
     }),
     getUserReviews: build.query<Review[], string[]>({
       query: (ids) => ({
@@ -71,6 +76,24 @@ export const rtkApi = createApi({
         url: "get_all_analysis_requests",
         method: "GET",
       }),
+      keepUnusedDataFor: 0, 
+    }),
+    startSoloAnalysis: build.mutation<{ analysis_result: string; analysis_status: string; request_id: number }, string[]>({
+      query: (worker_ids) => ({
+        url: "start_solo_analys",
+        method: "POST",
+        body: { worker_ids },
+      }),
+    }),
+    getAnalysisResults: build.query<{ criteria_scores: Record<string, number> }[], string>({
+      query: (worker_id) => ({
+        url: "get_analysis_results",
+        method: "POST",
+        body: {
+          worker_ids: [worker_id],
+        },
+      }),
+      keepUnusedDataFor: 0,
     }),
   }),
 });
@@ -82,4 +105,7 @@ export const {
   useStartAnalysisMutation,
   useLazyGetUserSummaryQuery,
   useGetAllAnalysisRequestsQuery,
+  useStartSoloAnalysisMutation,
+  useGetAnalysisResultsQuery,
+  useLazyGetAnalysisResultsQuery
 } = rtkApi;

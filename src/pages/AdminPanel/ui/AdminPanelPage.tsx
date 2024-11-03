@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Card, Input, Button, Form, ConfigProvider, Typography, notification, Spin, Alert, Select } from "antd";
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, DownOutlined, UpOutlined } from "@ant-design/icons";
 import { useAddReviewMutation, useGetAllAnalysisRequestsQuery } from "@/shared/api/rtkApi";
 import { useNavigate } from "react-router-dom";
 
@@ -13,8 +13,8 @@ const AdminPanelPage: React.FC = () => {
   const navigate = useNavigate();
 
   const { data: analysisRequests = [], error: analysisError, isLoading: isAnalysisLoading } = useGetAllAnalysisRequestsQuery();
-  
   const [sortOrder, setSortOrder] = useState<"default" | "asc" | "desc">("default");
+  const [expandedResults, setExpandedResults] = useState<{ [key: number]: boolean }>({});
 
   const onFinish = async (values: { reviewer_id: number; worker_id: number; review_text: string }) => {
     try {
@@ -38,19 +38,21 @@ const AdminPanelPage: React.FC = () => {
     }
   };
 
-  const renderAnalysisResult = (result: string | null) => {
+  const renderAnalysisResult = (result: string | string[] | null) => {
     if (!result) {
       return <Text style={{ color: "#FFFFFF" }}>Результат анализа отсутствует</Text>;
     }
-
-    try {
-      const cleanedResult = result.replace(/[{}"]/g, "");
-      return cleanedResult.split("\n").map((line, index) => (
-        <Text key={index} style={{ color: "#FFFFFF", display: "block", marginBottom: "5px" }}>{line}</Text>
-      ));
-    } catch {
-      return <Text style={{ color: "#FFFFFF" }}>{result}</Text>;
-    }
+  
+    const formattedResult = Array.isArray(result) ? result.join("\n") : result;
+  
+    return formattedResult.split("\n").map((line, index) => (
+      <Text 
+        key={index} 
+        style={{ color: "#FFFFFF", display: "block" }}
+      >
+        {line.trim() === '' ? <br /> : line}
+      </Text>
+    ));
   };
 
   const sortedAnalysisRequests = [...analysisRequests].sort((a, b) => {
@@ -61,6 +63,13 @@ const AdminPanelPage: React.FC = () => {
 
   const handleSortChange = (value: "default" | "asc" | "desc") => {
     setSortOrder(value);
+  };
+
+  const toggleResult = (id: number) => {
+    setExpandedResults((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
   };
 
   return (
@@ -124,8 +133,7 @@ const AdminPanelPage: React.FC = () => {
           <Select
             defaultValue="default"
             onChange={handleSortChange}
-            style={{ width: 200, color: "#000000" }} 
-            dropdownStyle={{ color: "#000000 !important" }} 
+            style={{ width: 200, color: "#000000" }}
           >
             <Option value="default">Без сортировки</Option>
             <Option value="asc">От самых старых</Option>
@@ -162,10 +170,22 @@ const AdminPanelPage: React.FC = () => {
                   <strong>Сотрудники:</strong> {request.worker_ids.join(", ")}
                 </Text>
                 <br />
-                <Text style={{ color: "#FFFFFF" }}><strong>Результат анализа:</strong></Text>
-                <div style={{ paddingLeft: "20px" }}>
-                  {renderAnalysisResult(request.analysis_result)}
-                </div>
+                <Text style={{ color: "#FFFFFF" }}>
+                  <strong>Общая оценка:</strong> {request.average || "Не указана"}
+                </Text>
+                <br />
+                <Text
+                  onClick={() => toggleResult(request.id)}
+                  style={{ color: "#FFFFFF", cursor: "pointer", display: "flex", alignItems: "center" }}
+                >
+                  Критерии и сводка
+                  {expandedResults[request.id] ? <UpOutlined style={{ marginLeft: 8 }} /> : <DownOutlined style={{ marginLeft: 8 }} />}
+                </Text>
+                {expandedResults[request.id] && (
+                  <div style={{ paddingLeft: "20px", marginTop: "10px" }}>
+                    {renderAnalysisResult(request.analysis_result)}
+                  </div>
+                )}
               </Card>
             ))
           )}
