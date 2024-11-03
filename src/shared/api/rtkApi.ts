@@ -37,8 +37,7 @@ export const rtkApi = createApi({
   }),
   endpoints: (build) => ({
     getAllUsers: build.query<any, void>({
-      query: () => "get_all",
-      keepUnusedDataFor: 0
+      query: () => "get_all"
     }),
     getUserReviews: build.query<Review[], string[]>({
       query: (ids) => ({
