@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Card, Typography, ConfigProvider, Button, Spin, Alert } from "antd";
+import { Card, Typography, ConfigProvider, Button, Spin, Alert, message } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { useGetUserReviewsQuery } from "@/shared/api/rtkApi";
+import { useGetUserReviewsQuery, useLazyGetUserSummaryQuery } from "@/shared/api/rtkApi";
 
 const { Title, Text } = Typography;
 
@@ -11,6 +11,19 @@ const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
 
   const { data: reviews = [], error, isLoading } = useGetUserReviewsQuery([id!]);
+  const [summary, setSummary] = useState<string | null>(null);
+  
+  const [getUserSummary, { isLoading: isSummaryLoading }] = useLazyGetUserSummaryQuery();
+
+  const handleGetSummary = async () => {
+    try {
+      const summaryData = await getUserSummary(id!).unwrap();
+      setSummary(summaryData);
+      message.success("Сводка получена успешно");
+    } catch {
+      message.error("Ошибка при получении сводки");
+    }
+  };
 
   return (
     <ConfigProvider
@@ -36,40 +49,72 @@ const ProfilePage: React.FC = () => {
           <Title level={2} style={{ color: "#FFFFFF" }}>Профиль сотрудника: {id}</Title>
         </Card>
 
-        <Card title={<span style={{ color: "#FFFFFF" }}>Отзывы</span>} bordered={false} style={{ backgroundColor: "#2C2C2C" }}>
-        {isLoading ? (
-  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "20px" }}>
-    <Spin />
-  </div>
-) : error ? (
-  <Alert message="Ошибка" description="Не удалось загрузить отзывы." type="error" showIcon />
-) : (
-  <div style={{ maxHeight: "400px", overflowY: "auto", paddingRight: "10px" }}>
-    {reviews.map((review, reviewIndex) => (
-      <div key={reviewIndex} style={{ marginBottom: "20px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
+          <Button
+            type="primary"
+            onClick={handleGetSummary}
+            loading={isSummaryLoading}
+            style={{
+              color: "#FFFFFF",
+              backgroundColor: "#333",
+              borderColor: "#F1F1F1",
+              borderWidth: 1,
+              borderStyle: "solid",
+              borderRadius: "4px",
+              boxShadow: "none"
+            }}
+          >
+            Получить сводку
+          </Button>
+        </div>
 
-        {Array.isArray(review.user_feedback) ? (
-          review.user_feedback.map((feedback, index) => (
-            <Card
-              key={index}
-              bordered={false}
-              style={{
-                backgroundColor: "#333",
-                marginBottom: "10px",
-                padding: "10px",
-                borderRadius: "8px",
-              }}
-            >
-              <Text style={{ color: "#FFFFFF" }}>{feedback}</Text>
-            </Card>
-          ))
-        ) : (
-          <Text style={{ color: "#FFFFFF" }}>Нет отзывов</Text>
+        {summary && (
+          <Card
+            bordered={false}
+            style={{
+              marginBottom: "20px",
+              backgroundColor: "#444",
+              padding: "10px",
+              borderRadius: "8px",
+            }}
+          >
+            <Text style={{ color: "#FFFFFF" }}>{summary}</Text>
+          </Card>
         )}
-      </div>
-    ))}
-  </div>
-)}
+
+        <Card title={<span style={{ color: "#FFFFFF" }}>Отзывы</span>} bordered={false} style={{ backgroundColor: "#2C2C2C" }}>
+          {isLoading ? (
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "20px" }}>
+              <Spin />
+            </div>
+          ) : error ? (
+            <Alert message="Ошибка" description="Не удалось загрузить отзывы." type="error" showIcon />
+          ) : (
+            <div style={{ maxHeight: "400px", overflowY: "auto", paddingRight: "10px" }}>
+              {reviews.map((review, reviewIndex) => (
+                <div key={reviewIndex} style={{ marginBottom: "20px" }}>
+                  {Array.isArray(review.user_feedback) ? (
+                    review.user_feedback.map((feedback, index) => (
+                      <Card
+                        key={index}
+                        bordered={false}
+                        style={{
+                          backgroundColor: "#333",
+                          marginBottom: "10px",
+                          padding: "10px",
+                          borderRadius: "8px",
+                        }}
+                      >
+                        <Text style={{ color: "#FFFFFF" }}>{feedback}</Text>
+                      </Card>
+                    ))
+                  ) : (
+                    <Text style={{ color: "#FFFFFF" }}>Нет отзывов</Text>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
       </div>
     </ConfigProvider>

@@ -11,9 +11,11 @@ const UserList: React.FC = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [showTooltip, setShowTooltip] = useState(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [showTooltip, setShowTooltip] = useState(() => {
+    return localStorage.getItem("tooltipShown") !== "true";
+  });
   const pageSize = 15;
 
   const { data: reviews, isLoading: isReviewsLoading } = useGetUserReviewsQuery(selectedIds, {
@@ -83,19 +85,43 @@ const UserList: React.FC = () => {
   return (
     <ConfigProvider theme={{ token: { colorBgContainer: "#1F1F1F", colorText: "#FFFFFF" } }}>
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "50px 0" }}>
-        <Input
-          prefix={<span style={{ color: "white" }}>Поиск ID: </span>}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            marginBottom: 16,
-            borderColor: "#5A9BD5",
-            color: "white",
-            backgroundColor: "#333",
-            padding: "4px 8px",
-            borderRadius: "4px",
-          }}
-        />
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+          <Input
+            prefix={<span style={{ color: "white" }}>Поиск ID: </span>}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              borderColor: "#5A9BD5",
+              color: "white",
+              backgroundColor: "#333",
+              padding: "4px 8px",
+              borderRadius: "4px",
+              flex: 1,
+              marginRight: 8,
+            }}
+          />
+          <Tooltip
+            title="Если Вам необходимо получить уязвимые места группы людей, выберите их из списка и нажмите 'Анализ'"
+            open={showTooltip}
+            onOpenChange={handleTooltipClose}
+          >
+            <Button
+              type="primary"
+              onClick={handleSubmit}
+              style={{
+                color: "#FFFFFF",
+                backgroundColor: "#333",
+                borderColor: "#5A9BD5",
+                borderWidth: 1,
+                borderStyle: "solid",
+                borderRadius: "4px",
+              }}
+              disabled={selectedRowKeys.length === 0}
+            >
+              Анализ
+            </Button>
+          </Tooltip>
+        </div>
 
         {isLoading ? (
           <div style={{ textAlign: "center", color: "#FFFFFF" }}>Загрузка...</div>
@@ -122,29 +148,6 @@ const UserList: React.FC = () => {
             />
           </>
         )}
-
-        <Tooltip
-          title="Если Вам необходимо получить уязвимые места группы людей, выберите их из списка и нажмите 'Анализ'"
-          open={showTooltip}
-          onOpenChange={handleTooltipClose}
-        >
-          <Button
-            type="primary"
-            onClick={handleSubmit}
-            style={{
-              marginTop: 16,
-              color: "#FFFFFF",
-              backgroundColor: "#333",
-              borderColor: "#5A9BD5",
-              borderWidth: 1,
-              borderStyle: "solid",
-              borderRadius: "4px",
-            }}
-            disabled={selectedRowKeys.length === 0}
-          >
-            Анализ
-          </Button>
-        </Tooltip>
       </div>
 
       <Modal

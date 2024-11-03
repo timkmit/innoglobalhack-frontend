@@ -53,7 +53,19 @@ export const rtkApi = createApi({
         },
       }),
     }),
+    getUserSummary: build.query<string, string>({
+      query: (id) => ({
+        url: `get_summary_by_profile/${id}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useGetAllUsersQuery, useGetUserReviewsQuery, useAddReviewMutation, useStartAnalysisMutation } = rtkApi;
+export const {
+  useGetAllUsersQuery,
+  useGetUserReviewsQuery,
+  useAddReviewMutation,
+  useStartAnalysisMutation,
+  useLazyGetUserSummaryQuery,
+} = rtkApi;

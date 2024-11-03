@@ -56,7 +56,7 @@ const AdminPanelPage: React.FC = () => {
 
         <Card bordered={false} style={{ marginBottom: "20px", backgroundColor: "#2C2C2C" }}>
           <Title level={2} style={{ color: "#FFFFFF" }}>Панель администрирования</Title>
-          <Title level={5} style={{ color: "#FFFFFF" }}>для добавления отзывов</Title>
+          <Title level={5} style={{ color: "#FFFFFF" }}>добавьте отзывы или посмотрите историю запросов</Title>
         </Card>
 
         <Card bordered={false} style={{ backgroundColor: "#2C2C2C" }}>
