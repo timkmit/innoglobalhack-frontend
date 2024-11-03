@@ -30,7 +30,7 @@ const ProfilePage: React.FC = () => {
 
       if (analysis_status === "completed") {
         setSummary(analysis_result);
-        message.success("Сводка получена успешно");
+        
       } else {
         message.warning("Анализ подготавливается, подождите");
       }
@@ -38,6 +38,22 @@ const ProfilePage: React.FC = () => {
       message.error("Ошибка при получении данных");
     }
   };
+
+  useEffect(() => {
+    const checkAnalysisResults = async () => {
+      try {
+        const initialResults = await triggerGetAnalysisResults(id!).unwrap();
+        //@ts-ignore
+        if (initialResults && initialResults.length > 0 && !initialResults[0].msg) {
+          handleGetSummary();
+        }
+      } catch {
+        console.log()
+      }
+    };
+
+    checkAnalysisResults();
+  }, [id, triggerGetAnalysisResults]);
 
   useEffect(() => {
     if (analysisResults && analysisResults.length > 0) {
