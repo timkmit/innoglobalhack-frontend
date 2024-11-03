@@ -12,6 +12,13 @@ interface AddReviewRequest {
   review_text: string;
 }
 
+interface AnalysisRequest {
+  id: number;
+  worker_ids: string[];
+  analysis_status: string;
+  analysis_result: string | null;
+}
+
 export const rtkApi = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
@@ -59,6 +66,12 @@ export const rtkApi = createApi({
         method: "GET",
       }),
     }),
+    getAllAnalysisRequests: build.query<AnalysisRequest[], void>({
+      query: () => ({
+        url: "get_all_analysis_requests",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -68,4 +81,5 @@ export const {
   useAddReviewMutation,
   useStartAnalysisMutation,
   useLazyGetUserSummaryQuery,
+  useGetAllAnalysisRequestsQuery,
 } = rtkApi;

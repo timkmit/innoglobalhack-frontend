@@ -24,4 +24,13 @@ export const GlobalStyles = createGlobalStyle`
   .ant-table {
     background-color: #222;
   }
+
+  .ant-select-selector {
+    color: #FFFFFF !important;
+    background-color: #333; 
+  }
+
+  .ant-select-dropdown .ant-select-item {
+    color: #000000 !important;
+  }
 `;
