@@ -1,42 +1,19 @@
 import React, { useState } from "react";
-import { Card, Input, Button, Form, ConfigProvider, Typography, notification, Spin, Alert, Select } from "antd";
+import { Card, ConfigProvider, Typography, Spin, Alert, Select } from "antd";
 import { DownOutlined, UpOutlined } from "@ant-design/icons";
-import { useAddReviewMutation, useGetAllAnalysisRequestsQuery } from "@/shared/api/rtkApi";
+import {  useGetAllAnalysisRequestsQuery } from "@/shared/api/rtkApi";
 import Header from "@/widgets/Header/ui/Header";
+import ReviewForm from "@/widgets/ReviewForm/ui/ReviewForm";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
 const AdminPanelPage: React.FC = () => {
-  const [addReview, { isLoading }] = useAddReviewMutation();
-  const [form] = Form.useForm();
 
 
   const { data: analysisRequests = [], error: analysisError, isLoading: isAnalysisLoading } = useGetAllAnalysisRequestsQuery();
   const [sortOrder, setSortOrder] = useState<"default" | "asc" | "desc">("default");
   const [expandedResults, setExpandedResults] = useState<{ [key: number]: boolean }>({});
-
-  const onFinish = async (values: { reviewer_id: number; worker_id: number; review_text: string }) => {
-    try {
-      const payload = {
-        reviewer_id: values.reviewer_id,
-        worker_id: values.worker_id,
-        review_text: values.review_text,
-      };
-
-      await addReview(payload).unwrap();
-      notification.success({
-        message: "Успешно",
-        description: "Отзыв успешно добавлен!",
-      });
-      form.resetFields();
-    } catch (error) {
-      notification.error({
-        message: "Ошибка",
-        description: "Не удалось добавить отзыв.",
-      });
-    }
-  };
 
   const renderAnalysisResult = (result: string | string[] | null) => {
     if (!result) {
@@ -86,36 +63,7 @@ const AdminPanelPage: React.FC = () => {
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "20px" }}>
         <Header/>
 
-        <Card bordered={false} style={{ backgroundColor: "#2C2C2C" }}>
-          <Form form={form} onFinish={onFinish} layout="vertical">
-            <Form.Item
-              label={<Text style={{ color: "#FFFFFF" }}>ID автора отзыва</Text>}
-              name="reviewer_id"
-              rules={[{ required: true, message: "Введите ID автора" }]}
-            >
-              <Input type="number" style={{ backgroundColor: "#333", color: "#FFFFFF", borderColor: "#5A9BD5" }} />
-            </Form.Item>
-            <Form.Item
-              label={<Text style={{ color: "#FFFFFF" }}>ID человека, которого оценивают</Text>}
-              name="worker_id"
-              rules={[{ required: true, message: "Введите ID человека под отзывом" }]}
-            >
-              <Input type="number" style={{ backgroundColor: "#333", color: "#FFFFFF", borderColor: "#5A9BD5" }} />
-            </Form.Item>
-            <Form.Item
-              label={<Text style={{ color: "#FFFFFF" }}>Текст отзыва</Text>}
-              name="review_text"
-              rules={[{ required: true, message: "Введите текст отзыва" }]}
-            >
-              <Input.TextArea rows={4} style={{ backgroundColor: "#333", color: "#FFFFFF", borderColor: "#5A9BD5" }} />
-            </Form.Item>
-            <Form.Item>
-              <Button type="primary" htmlType="submit" loading={isLoading} style={{ backgroundColor: "#5A9BD5", borderColor: "#5A9BD5" }}>
-                Добавить отзыв
-              </Button>
-            </Form.Item>
-          </Form>
-        </Card>
+        <ReviewForm />
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "20px" }}>
           <Title level={5} style={{ color: "#FFFFFF", marginBottom: 0 }}>История запросов анализа</Title>
