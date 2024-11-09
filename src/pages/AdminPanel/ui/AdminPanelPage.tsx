@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Card, Input, Button, Form, ConfigProvider, Typography, notification, Spin, Alert, Select } from "antd";
-import { ArrowLeftOutlined, DownOutlined, UpOutlined } from "@ant-design/icons";
+import { DownOutlined, UpOutlined } from "@ant-design/icons";
 import { useAddReviewMutation, useGetAllAnalysisRequestsQuery } from "@/shared/api/rtkApi";
-import { useNavigate } from "react-router-dom";
+import Header from "@/widgets/Header/ui/Header";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -10,7 +10,7 @@ const { Option } = Select;
 const AdminPanelPage: React.FC = () => {
   const [addReview, { isLoading }] = useAddReviewMutation();
   const [form] = Form.useForm();
-  const navigate = useNavigate();
+
 
   const { data: analysisRequests = [], error: analysisError, isLoading: isAnalysisLoading } = useGetAllAnalysisRequestsQuery();
   const [sortOrder, setSortOrder] = useState<"default" | "asc" | "desc">("default");
@@ -84,18 +84,7 @@ const AdminPanelPage: React.FC = () => {
       }}
     >
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "20px" }}>
-        <Button 
-          icon={<ArrowLeftOutlined />} 
-          onClick={() => navigate(-1)} 
-          style={{ marginBottom: "20px", color: "#FFFFFF", borderColor: "#FFFFFF" }}
-        >
-          Назад
-        </Button>
-
-        <Card bordered={false} style={{ marginBottom: "20px", backgroundColor: "#2C2C2C" }}>
-          <Title level={2} style={{ color: "#FFFFFF" }}>Панель администрирования</Title>
-          <Title level={5} style={{ color: "#FFFFFF" }}>добавьте отзывы или посмотрите историю запросов</Title>
-        </Card>
+        <Header/>
 
         <Card bordered={false} style={{ backgroundColor: "#2C2C2C" }}>
           <Form form={form} onFinish={onFinish} layout="vertical">
