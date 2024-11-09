@@ -34,7 +34,7 @@ const AnalysisRequestsHistory: React.FC = () => {
         ) : analysisError ? (
           <Alert message="Ошибка" description="Не удалось загрузить историю запросов." type="error" showIcon />
         ) : (
-          sortedAnalysisRequests.map((request) => <AnalysisRequestCard key={request.id} request={request} />)
+          <AnalysisRequestCard requests={sortedAnalysisRequests} />
         )}
       </Card>
     </>
