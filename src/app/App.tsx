@@ -4,6 +4,7 @@ import { PageLoader } from "@/widgets/PageLoader";
 import { GlobalStyles } from "./styles/globalStyles";
 import { USER_ACCESS_TOKEN } from "@/shared/consts/localStorage";
 import { useUserActions } from "@/entities/User";
+import { ConfigProvider } from "antd";
 
 const App = () => {
   const { setAuthData } = useUserActions();
@@ -22,14 +23,23 @@ const App = () => {
   }, []);
 
   return (
-    <div>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorBgContainer: "#1f1f1f",
+          colorText: "#ffffff",
+          colorTextHeading: "#ffffff",
+          colorBorder: "#333333",
+        },
+      }}
+    >
       <GlobalStyles />
       <Suspense fallback={<PageLoader />}>
         <div className="content-page">
           <AppRouter />
         </div>
       </Suspense>
-    </div>
+    </ConfigProvider>
   );
 };
 

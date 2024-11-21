@@ -1,11 +1,12 @@
-import { memo } from "react";
+import { lazy, memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Page } from "@/widgets/Page";
-import UserList from "@/widgets/UserList/ui/UserList";
 import { Row, Col, Typography, Tooltip, Button } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { UserOutlined, FormOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import CustomFooter from "@/widgets/CustomFooter/ui/CustomFooter";
+
+const UserList = lazy(() => import("@/widgets/UserList/ui/UserList"));
 
 const { Title } = Typography;
 
@@ -24,7 +25,21 @@ const MainPage = memo(() => {
             style={{
               position: "absolute",
               top: 0,
-              right: 0,
+              right: "70px",
+              margin: "20px",
+            }}
+          />
+        </Tooltip>
+        
+        <Tooltip title="Страница отзывов">
+          <Button
+            type="text"
+            icon={<FormOutlined style={{ fontSize: "24px", color: "#FFFFFF" }} />}
+            onClick={() => navigate("/reviewpage")}
+            style={{
+              position: "absolute",
+              top: 0,
+              right: "20px",
               margin: "20px",
             }}
           />
@@ -42,10 +57,10 @@ const MainPage = memo(() => {
               margin: 0,
             }}
           >
-            {t("HR Helper")}
+            {t("edu.Rewiev")}
           </Title>
           <UserList />
-          <CustomFooter/>
+          <CustomFooter />
         </Page>
       </Col>
 

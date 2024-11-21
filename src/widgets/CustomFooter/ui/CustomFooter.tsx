@@ -53,7 +53,7 @@ const CustomFooter: React.FC = () => {
               color: "#FFFFFF",
             }}
           >
-            Локация: Ростов-на-Дону
+            Ростов-на-Дону
           </Text>
           <Text
             style={{

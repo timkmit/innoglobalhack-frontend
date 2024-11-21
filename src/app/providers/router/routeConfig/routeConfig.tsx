@@ -1,10 +1,11 @@
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { LazyMainPage } from "@/pages/MainPage";
-import { AppRoutes, getRouteLogin, getRouteMain, getRouteNotFound,  getRouteProfile, getRouteAdminPanel } from "@/shared/consts/router";
+import { AppRoutes, getRouteLogin, getRouteMain, getRouteNotFound,  getRouteProfile, getRouteAdminPanel, getRouteReviewPage } from "@/shared/consts/router";
 import { AppRouteProps } from "@/shared/types/router";
 import { LazyLoginPage } from "@/pages/Login";
 import { LazyProfilePage } from "@/pages/ProfilePage";
 import { LazyAdminPanelPage } from "@/pages/AdminPanel";
+import { LazyReviewPage } from "@/pages/ReviewPage/ui/ReviewPage.lazy";
 
 export const routeConfig: Record<AppRoutes, AppRouteProps> = {
 	[AppRoutes.MAIN]: {
@@ -30,5 +31,9 @@ export const routeConfig: Record<AppRoutes, AppRouteProps> = {
 		element: <LazyAdminPanelPage />,
 		authOnly: true,
 	},
-
+	[AppRoutes.REVIEWPAGE]: {
+		path: getRouteReviewPage(),
+		element: <LazyReviewPage />,
+		authOnly: false,
+	},
 };
